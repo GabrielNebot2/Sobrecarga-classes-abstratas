@@ -1,0 +1,149 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class Registro {
+private:
+    string descricao;
+
+public:
+    Registro(string descricao) {
+        this->descricao = descricao;
+    }
+
+    void mostrar() {
+        cout << "- " << descricao << endl;
+    }
+};
+
+class Documento {
+private:
+    string tipo;
+    string especie;
+    vector<string> assinaturas;
+    vector<Registro> registros;
+
+public:
+    Documento(string tipo, string especie) {
+        this->tipo = tipo;
+        this->especie = especie;
+    }
+
+    void assinar(string setor) {
+        assinaturas.push_back(setor);
+        registros.push_back(Registro("Documento assinado pelo setor " + setor));
+    }
+
+    void adicionarRegistro(string acao) {
+        registros.push_back(Registro(acao));
+    }
+
+    void mostrar() {
+        cout << "Tipo: " << tipo << endl;
+        cout << "Especie: " << especie << endl;
+
+        cout << "Assinaturas:" << endl;
+        for (string assinatura : assinaturas) {
+            cout << "- " << assinatura << endl;
+        }
+
+        cout << "Registros:" << endl;
+        for (Registro r : registros) {
+            r.mostrar();
+        }
+
+        cout << endl;
+    }
+};
+
+class Setor {
+private:
+    string nome;
+    vector<Documento> declaracoes;
+
+public:
+    Setor(string nome) {
+        this->nome = nome;
+    }
+
+    string getNome() {
+        return nome;
+    }
+
+    void emitirDeclaracao(string tipo) {
+        Documento d(tipo, "Declaracao");
+        declaracoes.push_back(d);
+    }
+};
+
+class Processo {
+private:
+    int numero;
+    string setorAtual;
+    vector<Documento> documentos;
+    vector<Registro> registros;
+
+public:
+    Processo(int numero, string setor) {
+        this->numero = numero;
+        this->setorAtual = setor;
+    }
+
+    void moverSetor(string novoSetor) {
+        setorAtual = novoSetor;
+        registros.push_back(
+            Registro("Processo movido para o setor " + novoSetor)
+        );
+    }
+
+    void adicionarDocumento(Documento doc) {
+        documentos.push_back(doc);
+
+        registros.push_back(
+            Registro("Documento adicionado ao processo")
+        );
+    }
+
+    void mostrar() {
+        cout << "Processo: " << numero << endl;
+        cout << "Setor atual: " << setorAtual << endl;
+
+        cout << "\nDocumentos:\n" << endl;
+
+        for (Documento d : documentos) {
+            d.mostrar();
+        }
+
+        cout << "Historico do processo:" << endl;
+
+        for (Registro r : registros) {
+            r.mostrar();
+        }
+    }
+};
+
+int main() {
+    Setor financeiro("Financeiro");
+    Setor juridico("Juridico");
+
+    Processo processo(1001, "Financeiro");
+
+    Documento doc1("PDF", "Despacho");
+
+    doc1.assinar("Financeiro");
+    doc1.assinar("Juridico");
+
+    doc1.adicionarRegistro("Documento criado");
+    doc1.adicionarRegistro("Documento enviado para analise");
+
+    processo.adicionarDocumento(doc1);
+
+    processo.moverSetor("Juridico");
+
+    financeiro.emitirDeclaracao("WORD");
+
+    processo.mostrar();
+
+    return 0;
+}
